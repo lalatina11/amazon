@@ -11,7 +11,7 @@ void main() async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
   final authCubit = AuthCubit(sharedPreferences: sharedPreferences);
-
+  await authCubit.loadUser();
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider.value(value: authCubit)],
