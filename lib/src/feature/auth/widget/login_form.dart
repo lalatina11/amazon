@@ -42,7 +42,6 @@ class _LoginFormState extends State<LoginForm> {
         if (state is AuthLoggedIn) {
           Navigator.of(context).push(HomeScreen.route());
         }
-        // TODO: implement listener
       },
       builder: (context, state) {
         return Form(
@@ -50,6 +49,14 @@ class _LoginFormState extends State<LoginForm> {
           child: Column(
             spacing: 15,
             children: [
+              state is AuthError
+                  ? Center(
+                      child: Text(
+                        state.message,
+                        style: TextStyle(color: Colors.pink),
+                      ),
+                    )
+                  : Container(),
               Column(
                 crossAxisAlignment: .start,
                 spacing: 5,
