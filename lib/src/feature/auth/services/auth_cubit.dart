@@ -24,8 +24,11 @@ class AuthCubit extends Cubit<AuthState> {
       if (!res.success) {
         return emit(AuthError(message: res.message));
       }
-      await sharedPreferences.setString("token", res.data['token']);
-      emit(AuthLoggedIn(user: UserModel.fromMap(res.data['user'])));
+      final token = res.data['token'] as String;
+      await sharedPreferences.setString("token", token);
+      emit(
+        AuthLoggedIn(token: token, user: UserModel.fromMap(res.data['user'])),
+      );
     } catch (e) {
       print(e);
       emit(AuthSubmitError(message: "Unexpexted Error"));
@@ -35,27 +38,47 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login({required String email, required String password}) async {
     try {
       final res = await authServ.login(email: email, password: password);
-      if (!res.success) {
+      if (!res.success && res.data != null) {
         return emit(AuthError(message: res.message));
       }
-      await sharedPreferences.setString("token", res.data['token']);
-      emit(AuthLoggedIn(user: UserModel.fromMap(res.data['user'])));
+      final token = res.data['token'] as String;
+      await sharedPreferences.setString("token", token);
+      print(res.data['user']);
+      emit(
+        AuthLoggedIn(token: token, user: UserModel.fromMap(res.data['user'])),
+      );
     } catch (e) {
       print(e);
       emit(AuthSubmitError(message: "Unexpexted Error"));
     }
   }
 
-  Future<void> logout({required String email, required String password}) async {
+  Future<void> logout() async {
     try {
-      final res = await authServ.login(email: email, password: password);
-      if (!res.success) {
-        return emit(AuthError(message: res.message));
-      }
-      emit(AuthLoggedIn(user: UserModel.fromMap(res.data)));
+      final token = sharedPreferences.getString("token") ?? "";
+      await authServ.logout(token: token);
+      emit(AuthInitial());
     } catch (e) {
       print(e);
       emit(AuthSubmitError(message: "Unexpexted Error"));
+    }
+  }
+
+  Future<void> loadUser() async {
+    emit(AuthLoading());
+    try {
+      final token = sharedPreferences.getString("token") ?? "";
+      if (token.isEmpty) {
+        return emit(AuthInitial());
+      }
+      final res = await authServ.getCurrentUser(token: token);
+      if (!res.success || res.data == null) {
+        return emit(AuthInitial());
+      }
+      final user = UserModel.fromMap(res.data);
+      emit(AuthLoggedIn(token: token, user: user));
+    } catch (e) {
+      emit(AuthInitial());
     }
   }
 }
