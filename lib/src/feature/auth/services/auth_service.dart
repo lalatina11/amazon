@@ -73,7 +73,7 @@ class AuthService {
     final envConf = EnvConfig();
     try {
       final res = await http.get(
-        envConf.getApiBaseUrl(path: "/auth/login"),
+        envConf.getApiBaseUrl(path: "/auth/current-user"),
         headers: {...defaultHeaders, "Authorization": "Bearer $token"},
       );
       return ApiResponse.fromJson(res.body);
