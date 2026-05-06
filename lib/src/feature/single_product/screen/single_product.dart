@@ -17,9 +17,9 @@ class _SingleProductState extends State<SingleProduct> {
 
   String _formatPrice(String price) {
     final value = double.tryParse(price) ?? 0;
-    if (value >= 1000000) return '\$${(value / 1000000).toStringAsFixed(2)}M';
-    if (value >= 1000) return '\$${(value / 1000).toStringAsFixed(1)}K';
-    return '\$${value.toStringAsFixed(2)}';
+    if (value >= 1000000) return 'Rp${(value / 1000000).toStringAsFixed(2)}M';
+    if (value >= 1000) return 'Rp${(value / 1000).toStringAsFixed(1)}K';
+    return 'Rp${value.toStringAsFixed(2)}';
   }
 
   double _totalPrice() {
@@ -32,7 +32,7 @@ class _SingleProductState extends State<SingleProduct> {
     for (final c in cats) {
       if (name.contains(c)) return c;
     }
-    return 'Item';
+    return 'New';
   }
 
   @override

@@ -16,11 +16,11 @@ class _ProductCardState extends State<ProductCard> {
   String _formatPrice(String price) {
     final value = double.tryParse(price) ?? 0;
     if (value >= 1000000) {
-      return '\$${(value / 1000000).toStringAsFixed(1)}M';
+      return 'Rp${(value / 1000000).toStringAsFixed(1)}M';
     } else if (value >= 1000) {
-      return '\$${(value / 1000).toStringAsFixed(1)}K';
+      return 'Rp${(value / 1000).toStringAsFixed(1)}K';
     }
-    return '\$${value.toStringAsFixed(2)}';
+    return 'Rp${value.toStringAsFixed(2)}';
   }
 
   @override
@@ -37,7 +37,7 @@ class _ProductCardState extends State<ProductCard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -101,7 +101,7 @@ class _ProductCardState extends State<ProductCard> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -248,6 +248,6 @@ class _ProductCardState extends State<ProductCard> {
     for (final cat in categories) {
       if (productName.contains(cat)) return cat.toUpperCase();
     }
-    return 'ITEM';
+    return 'New';
   }
 }
