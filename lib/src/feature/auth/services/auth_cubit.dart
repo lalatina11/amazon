@@ -1,6 +1,7 @@
 import 'package:amazon/src/feature/auth/services/auth_service.dart';
 import 'package:amazon/src/feature/auth/services/auth_state.dart';
 import 'package:amazon/src/model/user_model.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +22,7 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      if (!res.success) {
+      if (!res.success || res.data == null) {
         return emit(AuthError(message: res.message));
       }
       final token = res.data['token'] as String;
@@ -38,7 +39,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login({required String email, required String password}) async {
     try {
       final res = await authServ.login(email: email, password: password);
-      if (!res.success && res.data != null) {
+      debugPrint("res $res");
+      if (!res.success || res.data == null) {
+        debugPrint("res msg ${res.message}");
         return emit(AuthError(message: res.message));
       }
       final token = res.data['token'] as String;
