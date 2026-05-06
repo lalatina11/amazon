@@ -1,4 +1,5 @@
 import 'package:amazon/src/constants/global_variables.dart';
+import 'package:amazon/src/feature/cart/screen/cart_screen.dart';
 import 'package:amazon/src/feature/home/widget/product_list.dart';
 import 'package:amazon/src/feature/search/screen/product_search_delegate.dart';
 import 'package:amazon/src/feature/single_product/screen/single_product.dart';
@@ -118,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(CartScreen.route());
+            },
           ),
         ],
       ),
