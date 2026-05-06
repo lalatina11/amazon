@@ -1,6 +1,10 @@
+import 'package:amazon/src/feature/auth/services/auth_cubit.dart';
+import 'package:amazon/src/feature/auth/services/auth_state.dart';
 import 'package:amazon/src/feature/auth/widget/password_input.dart';
 import 'package:amazon/src/feature/auth/services/auth_form_validator.dart';
+import 'package:amazon/src/feature/home/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -23,48 +27,65 @@ class _LoginFormState extends State<LoginForm> {
     passwordController.dispose();
   }
 
-  void handleSubmit() {
-    if (formKey.currentState!.validate()) {}
+  void handleSubmit() async {
+    if (formKey.currentState!.validate()) {
+      final email = emailController.text;
+      final password = passwordController.text;
+      await context.read<AuthCubit>().login(email: email, password: password);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: Column(
-        spacing: 15,
-        children: [
-          Column(
-            crossAxisAlignment: .start,
-            spacing: 5,
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthLoggedIn) {
+          Navigator.of(context).push(HomeScreen.route());
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return Form(
+          key: formKey,
+          child: Column(
+            spacing: 15,
             children: [
-              Text("Email", style: TextStyle(fontSize: 16)),
-              TextFormField(
-                controller: emailController,
-                validator: _formValidator.emailInputValidator,
+              Column(
+                crossAxisAlignment: .start,
+                spacing: 5,
+                children: [
+                  Text("Email", style: TextStyle(fontSize: 16)),
+                  TextFormField(
+                    controller: emailController,
+                    validator: _formValidator.emailInputValidator,
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: .start,
+                spacing: 5,
+                children: [
+                  Text("Password", style: TextStyle(fontSize: 16)),
+                  PasswordInput(controller: passwordController),
+                ],
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(.infinity, 45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: state is AuthSubmitting
+                      ? const Color.fromARGB(255, 158, 146, 108)
+                      : null,
+                ),
+                onPressed: state is AuthSubmitting ? null : handleSubmit,
+                child: Text("Login"),
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: .start,
-            spacing: 5,
-            children: [
-              Text("Password", style: TextStyle(fontSize: 16)),
-              PasswordInput(controller: passwordController),
-            ],
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(.infinity, 45),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: handleSubmit,
-            child: Text("Login"),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
