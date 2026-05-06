@@ -19,6 +19,7 @@ final class AuthError extends AuthState {
 }
 
 final class AuthLoggedIn extends AuthState {
+  String token;
   UserModel user;
-  AuthLoggedIn({required this.user});
+  AuthLoggedIn({required this.token, required this.user});
 }
