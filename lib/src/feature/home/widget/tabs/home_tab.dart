@@ -88,6 +88,7 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: GlobalVariables.secondaryColor,
         elevation: 0,
         title: GestureDetector(
