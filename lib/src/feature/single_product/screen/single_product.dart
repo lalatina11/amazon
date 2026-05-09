@@ -1,5 +1,10 @@
+import 'package:amazon/src/feature/auth/services/auth_cubit.dart';
+import 'package:amazon/src/feature/auth/services/auth_state.dart';
+import 'package:amazon/src/feature/cart/screen/cart_screen.dart';
+import 'package:amazon/src/feature/cart/services/cart_services.dart';
 import 'package:amazon/src/model/product_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SingleProduct extends StatefulWidget {
   final ProductModel product;
@@ -12,6 +17,7 @@ class SingleProduct extends StatefulWidget {
 }
 
 class _SingleProductState extends State<SingleProduct> {
+  final CartServices cartServices = CartServices();
   int _quantity = 1;
   bool _isWishlisted = false;
 
@@ -33,6 +39,38 @@ class _SingleProductState extends State<SingleProduct> {
       if (name.contains(c)) return c;
     }
     return 'New';
+  }
+
+  void _handleAddToCart({required String token}) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    final res = await cartServices.addToCart(
+      token: token,
+      productId: widget.product.id,
+      qty: _quantity,
+    );
+    debugPrint("res $res");
+    if (!res.success) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(res.message),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+      return;
+    }
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Berhasil menambahkan produk ke'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+    navigator.push(CartScreen.route());
   }
 
   @override
@@ -302,89 +340,101 @@ class _SingleProductState extends State<SingleProduct> {
                   ),
 
                   // Quantity + delivery info card
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      children: [
-                        // Quantity selector
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Jumlah',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A1A2E),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
+                  BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      if (state is AuthLoggedIn) {
+                        return Container(
+                          margin: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            children: [
+                              // Quantity selector
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  _QtyButton(
-                                    icon: Icons.remove,
-                                    onTap: () {
-                                      if (_quantity > 1) {
-                                        setState(() => _quantity--);
-                                      }
-                                    },
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      '$_quantity',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1A1A2E),
-                                      ),
+                                  const Text(
+                                    'Jumlah',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF1A1A2E),
                                     ),
                                   ),
-                                  _QtyButton(
-                                    icon: Icons.add,
-                                    onTap: () => setState(() => _quantity++),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF5F5F5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        _QtyButton(
+                                          icon: Icons.remove,
+                                          onTap: () {
+                                            if (_quantity > 1) {
+                                              setState(() => _quantity--);
+                                            }
+                                          },
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                          child: Text(
+                                            '$_quantity',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFF1A1A2E),
+                                            ),
+                                          ),
+                                        ),
+                                        _QtyButton(
+                                          icon: Icons.add,
+                                          onTap: () =>
+                                              setState(() => _quantity++),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
 
-                        const SizedBox(height: 16),
-                        const Divider(height: 1, color: Color(0xFFF0F0F0)),
-                        const SizedBox(height: 16),
+                              const SizedBox(height: 16),
+                              const Divider(
+                                height: 1,
+                                color: Color(0xFFF0F0F0),
+                              ),
+                              const SizedBox(height: 16),
 
-                        // Delivery info
-                        _InfoRow(
-                          icon: Icons.local_shipping_outlined,
-                          label: 'Free delivery',
-                          value: 'Est. 3–5 days',
-                        ),
-                        const SizedBox(height: 12),
-                        _InfoRow(
-                          icon: Icons.verified_outlined,
-                          label: 'Authentic product',
-                          value: 'Verified seller',
-                        ),
-                        const SizedBox(height: 12),
-                        _InfoRow(
-                          icon: Icons.refresh_outlined,
-                          label: '30-day returns',
-                          value: 'No questions asked',
-                        ),
-                      ],
-                    ),
+                              // Delivery info
+                              _InfoRow(
+                                icon: Icons.local_shipping_outlined,
+                                label: 'Free delivery',
+                                value: 'Est. 3–5 days',
+                              ),
+                              const SizedBox(height: 12),
+                              _InfoRow(
+                                icon: Icons.verified_outlined,
+                                label: 'Authentic product',
+                                value: 'Verified seller',
+                              ),
+                              const SizedBox(height: 12),
+                              _InfoRow(
+                                icon: Icons.refresh_outlined,
+                                label: '30-day returns',
+                                value: 'No questions asked',
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return Container();
+                    },
                   ),
                 ],
               ),
@@ -405,91 +455,95 @@ class _SingleProductState extends State<SingleProduct> {
           color: Colors.white,
           border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Total price
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total ($_quantity item${_quantity > 1 ? 's' : ''})',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                ),
-                Text(
-                  _formatPrice(_totalPrice().toString()),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1A1A2E),
+        child: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) {
+            if (state is AuthLoggedIn) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Total price
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total ($_quantity item${_quantity > 1 ? 's' : ''})',
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      ),
+                      Text(
+                        _formatPrice(_totalPrice().toString()),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1A1A2E),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-            // Buttons row
-            Row(
-              children: [
-                // Add to cart
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${product.name} added to cart'),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                  // Buttons row
+                  Row(
+                    children: [
+                      // Add to cart
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _handleAddToCart(token: state.token),
+                          icon: const Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 18,
+                          ),
+                          label: const Text('+ Keranjang'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF1A1A2E),
+                            side: const BorderSide(color: Color(0xFF1A1A2E)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-                    label: const Text('+ Keranjang'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF1A1A2E),
-                      side: const BorderSide(color: Color(0xFF1A1A2E)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
                       ),
-                    ),
-                  ),
-                ),
 
-                const SizedBox(width: 12),
+                      const SizedBox(width: 12),
 
-                // Checkout
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // navigate to checkout
-                    },
-                    icon: const Icon(Icons.bolt, size: 18, color: Colors.white),
-                    label: const Text(
-                      'Checkout',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
+                      // Checkout
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // navigate to checkout
+                          },
+                          icon: const Icon(
+                            Icons.bolt,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Checkout',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6B35),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6B35),
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              );
+            }
+            return Column(mainAxisSize: MainAxisSize.min);
+          },
         ),
       ),
     );
