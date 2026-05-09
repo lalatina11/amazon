@@ -210,7 +210,7 @@ class _SingleProductState extends State<SingleProduct> {
 
                         // Description
                         const Text(
-                          'Description',
+                          'Deskripsi Produk',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -316,7 +316,7 @@ class _SingleProductState extends State<SingleProduct> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Quantity',
+                              'Jumlah',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -447,7 +447,7 @@ class _SingleProductState extends State<SingleProduct> {
                       );
                     },
                     icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-                    label: const Text('Add to Cart'),
+                    label: const Text('+ Keranjang'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF1A1A2E),
                       side: const BorderSide(color: Color(0xFF1A1A2E)),
@@ -470,7 +470,7 @@ class _SingleProductState extends State<SingleProduct> {
                     },
                     icon: const Icon(Icons.bolt, size: 18, color: Colors.white),
                     label: const Text(
-                      'Buy Now',
+                      'Checkout',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
