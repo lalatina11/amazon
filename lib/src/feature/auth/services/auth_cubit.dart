@@ -59,11 +59,15 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     emit(AuthSubmitting());
     try {
-      final token = sharedPreferences.getString("token") ?? "";
-      if (token.isEmpty) {
+      final token = sharedPreferences.getString("token");
+      if (token == null || token.isEmpty) {
+        if (token != null) {
+          sharedPreferences.setString("token", "");
+        }
         return emit(AuthInitial());
       }
       await authServ.logout(token: token);
+      sharedPreferences.setString("token", "");
       emit(AuthInitial());
     } catch (e) {
       print(e);
@@ -74,8 +78,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> loadUser() async {
     emit(AuthLoading());
     try {
-      final token = sharedPreferences.getString("token") ?? "";
-      if (token.isEmpty) {
+      final token = sharedPreferences.getString("token");
+      if (token == null || token.isEmpty) {
         return emit(AuthInitial());
       }
       final res = await authServ.getCurrentUser(token: token);
