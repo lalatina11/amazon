@@ -29,8 +29,8 @@ class AuthFormValidator {
     if (name == null || name.isEmpty) {
       return "Nama harus diisi";
     }
-    if (name.length < 8) {
-      return "Nama min 8 karakter";
+    if (name.length < 3) {
+      return "Nama min 3 karakter";
     }
     if (name.length > 128) {
       return "Nama max 128 karakter";
