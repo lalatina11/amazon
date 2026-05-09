@@ -6,7 +6,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   static MaterialPageRoute route() =>
-      MaterialPageRoute(builder: (context) => const HomeTab());
+      MaterialPageRoute(builder: (context) => const HomeScreen());
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
