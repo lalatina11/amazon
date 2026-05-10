@@ -1,6 +1,6 @@
 import 'package:amazon/src/feature/home/widget/tabs/home_tab.dart';
-import 'package:amazon/src/feature/home/widget/tabs/user_tab.dart';
 import 'package:amazon/src/feature/home/widget/tabs/order_tab.dart';
+import 'package:amazon/src/feature/home/widget/tabs/user_tab.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,10 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.money_off_csred_rounded),
-            label: "",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
       ),
