@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   await dotenv.load();
+  await initializeDateFormatting('id_ID', null); // ← add this
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
   final authCubit = AuthCubit(sharedPreferences: sharedPreferences);
